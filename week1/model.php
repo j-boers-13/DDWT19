@@ -11,6 +11,151 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+/** Add a series */
+
+function add_series($pdo, $serie_info){
+    /* Check data type */
+    if (!is_numeric($serie_info['Seasons'])) {
+        return [
+            'type' => 'danger',
+            'message' => 'There was an error. You should enter a number in the
+            field Seasons.'
+        ];
+    }
+    /* Check if all fields are set */
+    if (
+        empty($serie_info['Name']) or
+        empty($serie_info['Creator']) or
+        empty($serie_info['Seasons']) or
+        empty($serie_info['Abstract'])
+    ) {
+        return [
+            'type' => 'danger',
+            'message' => 'There was an error. Not all fields were filled in.'
+        ];
+    }
+    /* Check if serie already exists */
+
+    $stmt = $pdo->prepare('SELECT * FROM series WHERE name = ?');
+    $stmt->execute([$serie_info['Name']]);
+    $serie = $stmt->rowCount();
+    if ($serie){
+        return [
+            'type' => 'danger',
+            'message' => 'This series was already added.'
+        ];
+    }
+
+    /* Add Serie */
+    $stmt = $pdo->prepare("INSERT INTO series (name, creator, seasons, abstract) VALUES (?, ?, ?, ?)");
+    $stmt->execute([
+        $serie_info['Name'],
+        $serie_info['Creator'],
+        $serie_info['Seasons'],
+        $serie_info['Abstract']
+    ]);
+    $inserted = $stmt->rowCount();
+    if ($inserted == 1) {
+        return [
+            'type' => 'success',
+            'message' => sprintf("Series '%s' added to Series Overview.", $serie_info['Name'])
+        ];
+    }
+    else {
+        return [
+            'type' => 'danger',
+            'message' => 'There was an error. The series was not added. Try it again.'
+        ];
+    }
+}
+
+/** Get info for a specific series */
+
+function get_series_info($pdo, $serie_id){
+    $stmt = $pdo->prepare('SELECT * FROM series WHERE id = ?');
+    $stmt->execute([$serie_id]);
+    $serie = $stmt->fetch();
+
+    return $serie;
+}
+
+/** Get all series in tables */
+
+function get_series_table($series){
+    $table_exp =
+        '
+        <table class="table table-hover">
+        <thead
+        <tr>
+        <th scope="col">Series</th>
+        <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>';
+            foreach($series as $key => $value){
+                $table_exp .=
+                    '
+        <tr>
+        <th scope="row">'.$value['name'].'</th>
+        <td><a href="/DDWT19/week1/serie/?serie_id='.$value['id'].'" role="button" class="btn btn-primary">More info</a></td>
+        </tr>
+        ';
+        }
+        $table_exp .=
+            '
+            </tbody>
+            </table>
+            ';
+    return $table_exp;
+}
+
+/** Get all series */
+
+function get_series($pdo){
+    $stmt = $pdo->prepare('SELECT * FROM series');
+    $stmt->execute();
+    $series = $stmt->fetchAll();
+    $series_exp = Array();
+    /* Create array with htmlspecialchars */
+    foreach ($series as $key => $value){
+        foreach ($value as $user_key => $user_input) {
+            $series_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
+    }
+    return $series_exp;
+}
+
+/** Count Series */
+
+function count_series($pdo){
+    $count = $pdo->query("SELECT count(*) FROM series") -> fetchColumn();
+    return $count;
+}
+
+/**
+ * Connect to the MySQL database
+ * @param $host
+ * @param $db
+ * @param $user
+ * @param $pass
+ * @return PDO
+ */
+
+function connect_db($host, $db, $user, $pass){
+    $charset = 'utf8mb4';
+    $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+    $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ];
+    try {
+        $pdo = new PDO($dsn, $user, $pass, $options);
+    } catch (\PDOException $e) {
+        echo sprintf("Failed to connect. %s",$e->getMessage());
+    }
+    return $pdo;
+}
+
 /**
  * Check if the route exist
  * @param string $route_uri URI to be matched
@@ -18,6 +163,8 @@ error_reporting(E_ALL);
  * @return bool
  *
  */
+
+
 function new_route($route_uri, $request_type){
     $route_uri_expl = array_filter(explode('/', $route_uri));
     $current_path_expl = array_filter(explode('/',parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)));

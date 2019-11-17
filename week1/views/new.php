@@ -34,6 +34,26 @@
                     <h5><?= $page_subtitle ?></h5>
                     <p><?= $page_content ?></p>
                     <!-- Put your form here -->
+                    <form action=<?=$form_action?> method="POST">
+                        <div class="form-group row">
+                            <?php if (isset($serie_id)){ echo "<input type=\"hidden\" value=". $serie_id . " name=\"serie_id\">";} ?>
+                            <label for="inputName" class="col-sm-2 col-form-label">Name</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="inputName" name="Name" value="<?php if (isset($series_info)){echo $series_info['name'];} ?>" required>
+                                </div>
+                            <label for="inputCreator" class="col-sm-2 col-form-label">Creator</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="inputCreator" name="Creator" value="<?php if (isset($series_info)){echo $series_info['creator'];} ?>" required>
+                                </div>
+                            <label for="inputSeasons" class="col-sm-2 col-form-label">Seasons</label>
+                                <div class="col-sm-10">
+                                    <input type="number" class="form-control" id="inputCreator" name="Seasons" value="<?php if (isset($series_info)){echo $series_info['seasons'];} ?>" required>
+                                </div>
+                            <label for="inputAbstract" class="col-sm-2 col-form-label">Abstract</label>
+                                <textarea class="form-control" id="inputAbstract" name="Abstract" required><?php if (isset($series_info)){echo $series_info['abstract'];} ?></textarea>
+                        <button type="submit"><?= $submit_btn ?>></button>
+                        </div>
+                    </form>
                 </div>
 
                 <!-- Right column -->
