@@ -131,9 +131,8 @@ elseif (new_route('/DDWT19/week1/add/', 'post')) {
     /* Page info */
     $serie_info = $_POST;
     $message = add_series($db, $serie_info);
-    if ($message['type'] === ['danger']){
-        $error_msg = $message['message'];
-    }
+    $error_msg = $message['message'];
+
     $page_title = 'Add Series';
     $breadcrumbs = get_breadcrumbs([
         'DDWT19' => na('/DDWT19/', False),
@@ -163,9 +162,9 @@ elseif (new_route('/DDWT19/week1/edit/', 'get')) {
     /* Get serie info from db */
     $serie_id = htmlspecialchars($_GET["serie_id"]);
     $series_info = get_series_info($db, $serie_id);
-    $serie_name = $series_info['name'];
-    $creators = $series_info['creator'];
-    $nbr_seasons = $series_info['seasons'];
+    $serie_name = htmlspecialchars($series_info['name']);
+    $creators = htmlspecialchars($series_info['creator']);
+    $nbr_seasons = htmlspecialchars($series_info['seasons']);
 
     /* Page info */
     $page_title = 'Edit Series';
@@ -195,19 +194,17 @@ elseif (new_route('/DDWT19/week1/edit/', 'get')) {
 /* Edit serie POST */
 elseif (new_route('/DDWT19/week1/edit/', 'post')) {
     $serie_info = $_POST;
-    $serie_name = $serie_info['Name'];
-    $creators = $serie_info['Creator'];
-    $nbr_seasons = $serie_info['Seasons'];
-    $serie_id = $serie_info['serie_id'];
+    $serie_name = htmlspecialchars($serie_info['Name']);
+    $creators = htmlspecialchars($serie_info['Creator']);
+    $nbr_seasons = htmlspecialchars($serie_info['Seasons']);
+    $serie_id = htmlspecialchars($serie_info['serie_id']);
 
     /* Get serie info from db */
-    $series_info = get_series_info($db, $serie_info['serie_id']);
+    $series_info = get_series_info($db, htmlspecialchars($serie_info['serie_id']));
 
     $message = update_series($db, $serie_info, $series_info);
 
-    if ($message['type'] === ['danger']){
-        $error_msg = $message['message'];
-    }
+    $error_msg = $message['message'];
 
     /* Page info */
     $page_title = $series_info['name'];
@@ -237,11 +234,14 @@ elseif (new_route('/DDWT19/week1/edit/', 'post')) {
 
 /* Remove serie */
 elseif (new_route('/DDWT19/week1/remove/', 'post')) {
+    $serie_id = $_POST['serie_id'];
+
     /* Remove serie in database */
     $serie_id = $_POST['serie_id'];
 /*    $feedback = remove_serie($db, $serie_id); */
 /*    $error_msg = get_error($feedback);*/
-
+        $message = remove_series($db, $serie_id);
+    $error_msg = $message['message'];
     /* Page info */
     $page_title = 'Overview';
     $breadcrumbs = get_breadcrumbs([

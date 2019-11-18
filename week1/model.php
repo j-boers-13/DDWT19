@@ -11,6 +11,28 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+/** Remove a series */
+
+function remove_series($pdo, $serie_id) {
+    $serie_info = get_series_info($pdo, $serie_id);
+    /* Delete Serie */
+    $stmt = $pdo->prepare("DELETE FROM series WHERE id = ?");
+    $stmt->execute([$serie_id]);
+    $deleted = $stmt->rowCount();
+    if ($deleted == 1) {
+        return [
+            'type' => 'success',
+            'message' => sprintf("Series '%s' was removed!", $serie_info['name'])
+        ];
+    }
+    else {
+        return [
+            'type' => 'warning',
+            'message' => 'An error occurred. The series was not removed.'
+        ];
+    }
+}
+
 /** Update a series */
 
 function update_series($pdo, $serie_info, $series_info) {
