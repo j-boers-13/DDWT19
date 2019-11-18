@@ -159,14 +159,13 @@ elseif (new_route('/DDWT19/week1/add/', 'post')) {
 
 /* Edit serie GET */
 elseif (new_route('/DDWT19/week1/edit/', 'get')) {
+
     /* Get serie info from db */
     $serie_id = htmlspecialchars($_GET["serie_id"]);
     $series_info = get_series_info($db, $serie_id);
-
-    $serie_name = 'House of Cards';
-    $serie_abstract = 'A Congressman works with his equally conniving wife to exact revenge on the people who betrayed him.';
-    $nbr_seasons = '6';
-    $creators = 'Beau Willimon';
+    $serie_name = $series_info['name'];
+    $creators = $series_info['creator'];
+    $nbr_seasons = $series_info['seasons'];
 
     /* Page info */
     $page_title = 'Edit Series';
@@ -195,13 +194,20 @@ elseif (new_route('/DDWT19/week1/edit/', 'get')) {
 
 /* Edit serie POST */
 elseif (new_route('/DDWT19/week1/edit/', 'post')) {
+    $serie_info = $_POST;
+    $serie_name = $serie_info['Name'];
+    $creators = $serie_info['Creator'];
+    $nbr_seasons = $serie_info['Seasons'];
+    $serie_id = $serie_info['serie_id'];
+
     /* Get serie info from db */
-    $serie_id = htmlspecialchars($_POST["serie_id"]);
-    $series_info = get_series_info($db, $serie_id);
-    $serie_name = 'House of Cards';
-    $serie_abstract = 'A Congressman works with his equally conniving wife to exact revenge on the people who betrayed him.';
-    $nbr_seasons = '6';
-    $creators = 'Beau Willimon';
+    $series_info = get_series_info($db, $serie_info['serie_id']);
+
+    $message = update_series($db, $serie_info, $series_info);
+
+    if ($message['type'] === ['danger']){
+        $error_msg = $message['message'];
+    }
 
     /* Page info */
     $page_title = $series_info['name'];
@@ -219,7 +225,7 @@ elseif (new_route('/DDWT19/week1/edit/', 'post')) {
 
     /* Page content */
     $submit_btn = "Edit Series";
-    $form_action = '/DDWT19/week1/edit/?serie=' . $serie_id;
+    $form_action = '/DDWT19/week1/edit/?serie=' . $serie_info['serie_id'];
     $series_count = count_series($db);
     $right_column = use_template('cards');
     $page_subtitle = sprintf("Information about %s", $serie_name);
