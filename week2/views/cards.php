@@ -10,3 +10,14 @@
         <a href="/DDWT19/week2/add/" class="btn btn-primary">List yours</a>
     </div>
 </div>
+<div class="card">
+    <div class="card-header">
+        Users
+    </div>
+    <div class="card-body">
+        <p class="count">Series overview already has</p>
+        <h2><?= $nbr_users ?></h2>
+        <p>active users now</p>
+        <a href="/DDWT19/week2/add/" class="btn btn-primary">Join now</a>
+    </div>
+</div>
