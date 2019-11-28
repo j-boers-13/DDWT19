@@ -129,7 +129,7 @@ function get_navigation($navigation){
  * @param array $series with series from the db
  * @return string
  */
-function get_serie_table($series){
+function get_serie_table($pdo, $series){
     $table_exp = '
     <table class="table table-hover">
     <thead
@@ -143,6 +143,7 @@ function get_serie_table($series){
         $table_exp .= '
         <tr>
             <th scope="row">'.$value['name'].'</th>
+            <th scope="row">'.get_user_name($pdo, $value['user_id']).'</th>
             <td><a href="/DDWT19/week2/serie/?serie_id='.$value['id'].'" role="button" class="btn btn-primary">More info</a></td>
         </tr>
         ';
@@ -256,12 +257,12 @@ function add_serie($pdo, $serie_info){
     }
 
     /* Add Serie */
-    $stmt = $pdo->prepare("INSERT INTO series (name, creator, seasons, abstract) VALUES (?, ?, ?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO series (name, creator, seasons, abstract,user_id) VALUES (?, ?, ?, ?,?)");
     $stmt->execute([
         $serie_info['Name'],
         $serie_info['Creator'],
         $serie_info['Seasons'],
-        $serie_info['Abstract']
+        $serie_info['Abstract'],
     ]);
     $inserted = $stmt->rowCount();
     if ($inserted ==  1) {
@@ -402,6 +403,7 @@ function redirect($location){
  * Get current user id
  * @return bool current user id or False if not logged in
  */
+
 function get_user_id(){
     session_start();
     if (isset($_SESSION['user_id'])){
@@ -409,4 +411,12 @@ function get_user_id(){
     } else {
         return False;
     }
+}
+
+function get_user_name($pdo, $user_id){
+    $stmt = $pdo->prepare('SELECT firstname, lastname FROM users WHERE id = ?');
+    $stmt->execute([$user_id]);
+    $name = $stmt->fetch_assoc();
+    return $name;
+
 }
