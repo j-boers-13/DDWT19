@@ -1,0 +1,16 @@
+{
+  "name": "j-boers-13/DDWT19_week3",
+  "description": "",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Jeroen Boers",
+      "email": "j.boers.13@student.rug.nl"
+    }
+  ],
+  "require": {
+    "bramus/router": "1.4.2",
+    "ext-json": "*"
+  }
+}
