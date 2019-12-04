@@ -107,7 +107,7 @@ function add_serie($pdo, $serie_info){
 
     /* Check if serie already exists */
     $stmt = $pdo->prepare('SELECT * FROM series WHERE name = ?');
-    $stmt->execute([$serie_info['Name']]);
+    $stmt->execute([htmlspecialchars($serie_info['Name'])]);
     $serie = $stmt->rowCount();
     if ($serie){
         return [
@@ -119,10 +119,10 @@ function add_serie($pdo, $serie_info){
     /* Add Serie */
     $stmt = $pdo->prepare("INSERT INTO series (name, creator, seasons, abstract) VALUES (?, ?, ?, ?)");
     $stmt->execute([
-        $serie_info['Name'],
-        $serie_info['Creator'],
-        $serie_info['Seasons'],
-        $serie_info['Abstract']
+        htmlspecialchars($serie_info['Name']),
+        htmlspecialchars($serie_info['Creator']),
+        htmlspecialchars($serie_info['Seasons']),
+        htmlspecialchars($serie_info['Abstract'])
     ]);
     $inserted = $stmt->rowCount();
     if ($inserted ==  1) {
@@ -176,7 +176,7 @@ function update_serie($pdo, $serie_info){
 
     /* Check if serie already exists */
     $stmt = $pdo->prepare('SELECT * FROM series WHERE name = ?');
-    $stmt->execute([$serie_info['Name']]);
+    $stmt->execute([htmlspecialchars($serie_info['Name'])]);
     $serie = $stmt->fetch();
     if ($serie_info['Name'] == $serie['name'] and $serie['name'] != $current_name){
         return [
@@ -188,11 +188,11 @@ function update_serie($pdo, $serie_info){
     /* Update Serie */
     $stmt = $pdo->prepare("UPDATE series SET name = ?, creator = ?, seasons = ?, abstract = ? WHERE id = ?");
     $stmt->execute([
-        $serie_info['Name'],
-        $serie_info['Creator'],
-        $serie_info['Seasons'],
-        $serie_info['Abstract'],
-        $serie_info['serie_id']
+        htmlspecialchars($serie_info['Name']),
+        htmlspecialchars($serie_info['Creator']),
+        htmlspecialchars($serie_info['Seasons']),
+        htmlspecialchars($serie_info['Abstract']),
+        htmlspecialchars($serie_info['serie_id'])
     ]);
     $updated = $stmt->rowCount();
     if ($updated ==  1) {
