@@ -15,8 +15,20 @@ include 'model.php';
 /* Connect to DB */
 $db = connect_db('localhost', 'ddwt19_week3', 'ddwt19', 'ddwt19');
 
+/* Set credentials */
+$cred = set_cred("ddwt19", "ddwt19");
+
 /* Create Router instance */
 $router = new \Bramus\Router\Router();
+
+$router->before('GET|POST|PUT|DELETE', '/api/.*', function() use($cred){
+    if (!check_cred($cred)){
+        $errorObj = new stdClass();
+        $errorObj->message = "Invalid credentials!";
+        echo json_encode($errorObj);
+        exit();
+    }
+});
 
 // Add routes here
 $router->mount('/api', function () use ($db, $router) {
